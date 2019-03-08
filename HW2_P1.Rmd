@@ -1,0 +1,85 @@
+---
+title: "201 HW2 Problem1"
+author: "Barbara Rose Hoover"
+date: "3/7/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#1
+
+```{r}
+#Loading necessary packages
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(quantmod)
+```
+
+```{r}
+#Reading in the data
+grain<-read_csv("grain.csv")
+```
+
+```{r}
+#creating statis plot: Yield vs. Time
+grain_plot <- ggplot(grain, aes(year, yield, color=commodity))+
+  geom_line()
+
+grain_plot
+```
+
+The graphs look like "Linear Lower Plateau"
+
+```{r}
+#Creating animated plot
+
+df<-grain %>% 
+  select(year, commodity, yield)
+
+accumulate_by <- function(dat, var) {
+  var <- lazyeval::f_eval(var, dat)
+  lvls <- plotly:::getLevels(var)
+  dats <- lapply(seq_along(lvls), function(x) {
+    cbind(dat[var %in% lvls[seq(1, x)], ], frame = lvls[[x]])
+  })
+  dplyr::bind_rows(dats)
+}
+
+df <- df %>%
+  accumulate_by(~year)
+
+p <- ggplot(df,aes(year, yield, frame = frame, color=commodity)) +
+  geom_line()
+
+p <- ggplotly(p) %>%
+  layout(
+    title = "Patterns in Yield Over Time",
+    yaxis = list(
+      title = "Yield \n (Bushels per Acre)",
+      zeroline = F
+    ),
+    xaxis = list(
+      title = "Year",
+      zeroline = F, 
+      showgrid = F
+    )
+  ) %>% 
+  animation_opts(
+    frame = 10, 
+    transition = 0, 
+    redraw = FALSE
+  ) %>%
+  animation_slider(
+    currentvalue = list(
+      prefix = "Year"
+    )
+  )
+p
+
+```
+
