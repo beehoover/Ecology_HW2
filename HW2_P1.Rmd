@@ -36,10 +36,19 @@ grain_plot
 The graphs look like "Linear Lower Plateau"
 
 ```{r}
+df <- grain %>% 
+  select(year, commodity, yield) %>% 
+  spread(commodity, yield, fill = NA) %>% # makes it into a wide format, missing combinationes are filled with NA
+  gather(commodity, yield, -year) # Brings it back to long format, but now all years for no data in Sorghum have a 0
+```
+
+
+
+```{r}
 #Creating animated plot
 
-df<-grain %>% 
-  select(year, commodity, yield)
+#df<-grain %>% 
+#  select(year, commodity, yield)
 
 accumulate_by <- function(dat, var) {
   var <- lazyeval::f_eval(var, dat)
@@ -81,5 +90,8 @@ p <- ggplotly(p) %>%
   )
 p
 
+```
+```{r}
+#need to make gif
 ```
 

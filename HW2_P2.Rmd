@@ -1,0 +1,63 @@
+---
+title: "HW2_p2"
+author: "Barbara Rose Hoover"
+date: "3/9/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+fert<-read_csv("fertilizer.csv")
+```
+
+a. Create a finalized plot (including title and caption) of fertilizer use vs time for each of the crops in the dataset. (15 points)
+
+```{r}
+#wrangling data to make df for each crop
+wheat<-fert %>% 
+  filter(crop == "Wheat") %>% #filter for specific crop
+  spread(fertilizer, ppa) %>% #make individual columns for each fertilizer
+  mutate(total=nitrogen + phosphate+ potassium) %>% #create a "total" column for total fertilizer applied for each year
+  select(-crop) %>% #take out the crop name 
+  gather(fertilizer, ppa, -year) #bring back to tidy/ long format for easier plotting
+
+corn<-fert %>% 
+  filter(crop == "Corn") %>% 
+  spread(fertilizer, ppa) %>% 
+  mutate(total=nitrogen + phosphate+ potassium) %>%
+  select(-crop) %>% 
+  gather(fertilizer, ppa, -year)
+
+soybean<-fert %>% 
+  filter(crop == "Soybeans") %>% 
+  spread(fertilizer, ppa) %>% 
+  mutate(total=nitrogen + phosphate+ potassium) %>%
+  select(-crop) %>% 
+  gather(fertilizer, ppa, -year)
+
+```
+
+```{r}
+#creating graphs for total fert applied for each crop
+wheat_fert <- ggplot(wheat,aes(year, ppa, color=fertilizer)) +
+  geom_point()
+wheat_fert
+
+soy_fert <- ggplot(soybean,aes(year, ppa, color=fertilizer)) +
+  geom_point()
+soy_fert
+
+corn_fert <- ggplot(corn,aes(year, ppa, color=fertilizer)) +
+  geom_point()
+corn_fert
+```
+
+b. Describe differences in fertilizer use for each crop. What does this suggest about limiting nutrients for
+each crop? (20 points)
+
+-Corn has most fertilizer applied 
+  +Reaches max around 1980, levels out from then
+
