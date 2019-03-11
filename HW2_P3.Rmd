@@ -1,0 +1,38 @@
+---
+title: "HW2_P3"
+author: "Barbara Rose Hoover"
+date: "3/9/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+grain<-read_csv("grain.csv")
+fert<-read_csv("fertilizer.csv")
+```
+
+```{r}
+corn_yield<-grain %>% 
+  filter(commodity=="Corn") %>% 
+  select(year, yield)
+
+corn_fert_3<-fert %>% 
+  filter(crop == "Corn") %>% 
+  spread(fertilizer, ppa) %>% 
+  mutate(total=nitrogen + phosphate+ potassium) %>%
+  select(-crop) %>% 
+  gather(fertilizer, ppa, -year)
+
+corn_3<-merge(corn_fert_3, corn_yield, all.x = TRUE, by= "year")
+```
+```{r}
+corn_plot<-ggplot(corn_3, aes(x= ppa, y=yield))+
+  geom_point(aes(color = year))+
+  facet_wrap(~fertilizer, scale= "free")+
+  scale_color_gradientn(colours = rainbow(10))
+corn_plot
+```
+
